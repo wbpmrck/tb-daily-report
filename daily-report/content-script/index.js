@@ -1,0 +1,27 @@
+console.log('content script loaded!')
+
+
+// 向页面注入JS
+function injectCustomJs(jsPath)
+{
+	jsPath = jsPath || 'js/inject.js';
+	var temp = document.createElement('script');
+	temp.setAttribute('type', 'text/javascript');
+	// 获得的地址类似：chrome-extension://ihcokhadfjfchaeagdoclpnjdiokfakg/js/inject.js
+	temp.src = chrome.extension.getURL(jsPath);
+	temp.onload = function()
+	{
+        console.log('load success')
+		// 放在页面不好看，执行完后移除掉
+		this.parentNode.removeChild(this);
+	};
+	document.head.appendChild(temp);
+}
+
+$(()=>{
+	console.log('content script 发送请求!')
+	chrome.runtime.sendMessage({greeting: '你好，我是content-script呀，我主动发消息给后台！'}, function(response) {
+		console.log('收到来自后台的回复：');
+		console.log(response);
+	});
+});
